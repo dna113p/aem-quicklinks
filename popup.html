@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="popup.js"></script>
+  <style>
+    body {
+      width: 300px;
+    }
+    #links {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    button { 
+      white-space: nowrap;
+      flex-grow: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">Checking...</div>
+  <div id="links" style="display: none;">
+    <button id="preview">Preview</button>
+    <button id="editor">Editor</button>
+    <button id="properties">Properties</button>
+    <button id="crxde">Crx</button>
+  </div>
+</body>
+</html>
+
