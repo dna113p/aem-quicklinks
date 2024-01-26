@@ -15,6 +15,7 @@ function createConfigElement(config = { regex: '', domains: '' }) {
   container.appendChild(regexInput);
 
   const domainsInput = document.createElement('input');
+  domainsInput.classList.add('domains');
   domainsInput.placeholder = 'Comma-separated Domains';
   domainsInput.value = config.domains;
   container.appendChild(domainsInput);
