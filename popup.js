@@ -31,3 +31,54 @@ function openLink(link) {
   chrome.tabs.create({url: link});
 }
 
+
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  var url = new URL(tabs[0].url);
+
+  chrome.storage.sync.get('domainConfigs', function(data) {
+    if (data.domainConfigs) {
+      let matchedConfigs = data.domainConfigs.filter(config => url.href.match(new RegExp(config.regex)));
+      if (matchedConfigs.length > 0) {
+        // Assuming the first matched configuration is used
+        let domains = matchedConfigs[0].domains.split(',');
+        populateDomainSelector(domains, url.origin);
+        // Rest of your existing code with modifications...
+      } else {
+        document.getElementById('status').textContent = 'Not an AEM Page.';
+      }
+    }
+  });
+});
+
+function normalizeDomain(domain) {
+  return domain.replace(/^(https?:\/\/)?/i, '') // Remove protocol
+              .replace(/\/+$/, ''); // Remove trailing slashes
+}
+
+function populateDomainSelector(domains, currentDomain) {
+  const selector = document.getElementById('domainSelector');
+  selector.innerHTML = ''; // Clear existing options
+  const normalizedCurrentDomain = normalizeDomain(currentDomain);
+
+  domains.forEach(domain => {
+    domain = domain.trim();
+    if (domain) {
+      let option = document.createElement('option');
+      option.value = domain;
+      option.textContent = domain;
+      option.selected = normalizeDomain(domain) === normalizedCurrentDomain;
+      selector.appendChild(option);
+    }
+  });
+  selector.style.display = '';
+  selector.onchange = () => swapDomain(selector.value);
+}
+
+function swapDomain(newDomain) {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    var oldUrl = new URL(tabs[0].url);
+    var newUrlBase = newDomain.includes('://') ? newDomain : `http://${newDomain}`;
+    var newUrl = oldUrl.href.replace(oldUrl.origin, newUrlBase);
+    openLink(newUrl); // Open the new URL in a new tab
+  });
+}
