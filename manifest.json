@@ -1,9 +1,9 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "AEM Author Quicklinks",
   "description": "Quick links for navigating the various edit locations for Adobe Experience Manager pages",
   "version": "1.0",
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html"
   },
   "options_page": "options.html",

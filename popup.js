@@ -4,7 +4,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
   const isPropertiesPage =  url.href.match('/mnt/overlay/wcm/core/content/sites/properties')
 
   var contentPath = (isPropertiesPage ? url.search : url.href).match(/(\/content\/[^?]+)/)[0];
-  contentPath = contentPath.split('.html')[0];
+  contentPath = contentPath.split('.html')[0] || aemPath;
   var baseUrl = url.origin;
 
   const urls = {
@@ -13,6 +13,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     properties: `${baseUrl}/mnt/overlay/wcm/core/content/sites/properties.html?item=${contentPath}`,
     crx: `${baseUrl}/crx/de/index.jsp#${contentPath}`
   }
+
 
   if (contentPath) {
     document.getElementById('status').textContent = 'AEM Page Detected!';
@@ -40,7 +41,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       let matchedConfigs = data.domainConfigs.filter(config => url.href.match(new RegExp(config.regex)));
       if (matchedConfigs.length > 0) {
         // Assuming the first matched configuration is used
-        let domains = matchedConfigs[0].domains.split(',');
+        let {domains} = matchedConfigs[0];
         populateDomainSelector(domains, url.origin);
         // Rest of your existing code with modifications...
       } else {

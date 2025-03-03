@@ -7,27 +7,63 @@ chrome.storage.sync.get('domainConfigs', function(data) {
   }
 });
 
-function createConfigElement(config = { regex: '', domains: '' }) {
+function createConfigElement(config = { regex: '', domains: [] }) {
   const container = document.createElement('div');
+  
   const regexInput = document.createElement('input');
   regexInput.placeholder = 'Regex Pattern';
   regexInput.value = config.regex;
-  container.appendChild(regexInput);
 
-  const domainsInput = document.createElement('input');
-  domainsInput.classList.add('domains');
-  domainsInput.placeholder = 'Comma-separated Domains';
-  domainsInput.value = config.domains;
-  container.appendChild(domainsInput);
+  // Container for domains
+  const domainsList = document.createElement('ul');
+  config.domains.forEach(domain => addDomainToList(domain, domainsList));
+
+  const domainInput = document.createElement('input');
+  domainInput.placeholder = 'New Domain';
+
+  const addDomainButton = document.createElement('button');
+  addDomainButton.textContent = '+';
+  addDomainButton.onclick = function() {
+    const domain = domainInput.value.trim();
+    if (domain) {
+      addDomainToList(domain, domainsList); // Add domain to the list
+      saveConfigs();
+    }
+  };
 
   const deleteButton = document.createElement('button');
-  deleteButton.textContent = 'Delete';
+  deleteButton.textContent = 'Remove Config';
+  deleteButton.classList.add('delete');
   deleteButton.onclick = function() {
     container.remove();
     saveConfigs();
   };
+
+  container.appendChild(regexInput);
+  container.appendChild(domainInput);
+  container.appendChild(addDomainButton);
   container.appendChild(deleteButton);
+  container.appendChild(domainsList);
+
   document.getElementById('domainConfigs').appendChild(container);
+}
+
+function addDomainToList(domain, domainsList) {
+  const listItem = document.createElement('li');
+  const domainText = document.createElement('span');
+
+  domainText.textContent = domain;
+
+  const removeButton = document.createElement('button');
+  removeButton.textContent = 'X';
+  removeButton.onclick = function() {
+    listItem.remove();
+    saveConfigs();
+  };
+  
+  listItem.appendChild(domainText);
+  listItem.appendChild(removeButton);
+  domainsList.appendChild(listItem);
 }
 
 function addDomainConfig() {
@@ -36,12 +72,11 @@ function addDomainConfig() {
 
 function saveConfigs() {
   const configs = Array.from(document.querySelectorAll('#domainConfigs div')).map(container => {
-    return {
-      regex: container.children[0].value,
-      domains: container.children[1].value
-    };
+    const regex = container.children[0].value;
+    const domainsList = Array.from(container.querySelectorAll('li span')).map(listItem => listItem.textContent.trim());
+    return { regex, domains: domainsList };
   });
-  chrome.storage.sync.set({domainConfigs: configs});
+  chrome.storage.sync.set({ domainConfigs: configs });
 }
 
 // Save configs on input changes
