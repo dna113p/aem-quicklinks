@@ -23,5 +23,10 @@
   "permissions": [
     "activeTab",
     "storage"
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "aem-quicklinks@aem-quicklinks"
+    }
+  }
 }
