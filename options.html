@@ -1,120 +1,290 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Extension Options</title>
-    <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    color: #333;
-    background-color: #f5f5f5;
-  }
+  <meta charset="UTF-8">
+  <title>AEM Quicklinks — Settings</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  h2 {
-    color: #444;
-    margin-bottom: 10px;
-  }
+    body {
+      background: #0b0b14;
+      color: #c8c8e0;
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 48px 32px;
+    }
 
-  #domainConfigs {
-    margin-top: 15px;
-  }
+    /* Subtle scanline */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(200, 200, 240, 0.005) 2px,
+        rgba(200, 200, 240, 0.005) 4px
+      );
+      pointer-events: none;
+      z-index: 900;
+    }
 
-  #domainConfigs > div {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 20px;
-    background-color: #fff;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    position: relative;
-    max-width: 1000px;
-  }
+    /* Top accent bar */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #4ecdc4, #c084fc, #ffd93d);
+      z-index: 1000;
+    }
 
-  input {
-    max-width: 400px;
-    padding: 6px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box; /* Ensure consistent width */
-  }
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
 
-  button {
-    padding: 6px 10px;
-    background-color: #f44;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-  }
+    header {
+      margin-bottom: 36px;
+    }
 
-  .delete {
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin: 10px;
-  }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e0e0f0;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
 
-  button:hover {
-    background-color: #d33;
-  }
+    h1 .accent {
+      color: #4ecdc4;
+    }
 
-  #addConfig {
-    padding: 8px 15px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-  }
+    .subtitle {
+      font-size: 12px;
+      color: #5a5a78;
+      letter-spacing: 0.02em;
+    }
 
-  #addConfig:hover {
-    background-color: #45a049;
-  }
+    /* Config cards */
+    .config-card {
+      background: #111122;
+      border: 1px solid #222240;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 14px;
+      position: relative;
+      transition: border-color 0.2s;
+    }
 
-  ul {
-    padding-left: 15px;
-    margin-top: 8px;
-    list-style-type: none;
-    flex-basis: 100%;
-  }
+    .config-card:hover {
+      border-color: #2a2a50;
+    }
 
-  ul li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-  }
+    .field-group {
+      margin-bottom: 16px;
+    }
 
-  ul li button {
-    background: none;
-    color: red;
-    margin-left: 8px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 10px;
-  }
+    .field-label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #5a5a78;
+      margin-bottom: 6px;
+    }
 
-  ul li button:hover {
-    background-color: #d33;
-    color: white;
-  }
-</style>
+    .field-input {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0b0b14;
+      border: 1px solid #2a2a44;
+      border-radius: 5px;
+      color: #c8c8e0;
+      font-family: inherit;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
 
+    .field-input:focus {
+      border-color: #4ecdc4;
+      box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.08);
+    }
+
+    .field-input::placeholder {
+      color: #3a3a55;
+    }
+
+    /* Domain row: input + add button */
+    .domain-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .domain-row .field-input {
+      flex: 1;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+
+    .btn-add {
+      background: #4ecdc4;
+      color: #0b0b14;
+    }
+    .btn-add:hover {
+      background: #3dbdb5;
+    }
+
+    .btn-delete-config {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: transparent;
+      border: 1px solid #3a2028;
+      color: #ff6b6b;
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+    .btn-delete-config:hover {
+      background: #2a1018;
+      border-color: #ff6b6b;
+    }
+
+    /* Domain list */
+    .domain-list {
+      list-style: none;
+    }
+
+    .domain-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      background: #0d0d1a;
+      border: 1px solid #1a1a30;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: #a0a0c0;
+      transition: border-color 0.15s;
+    }
+
+    .domain-item:hover {
+      border-color: #2a2a50;
+    }
+
+    .btn-remove-domain {
+      background: none;
+      border: none;
+      color: #5a3040;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      transition: all 0.15s;
+      line-height: 1;
+    }
+    .btn-remove-domain:hover {
+      color: #ff6b6b;
+      background: #2a1018;
+    }
+
+    /* Add config button */
+    #addConfig {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #141428;
+      border: 1px dashed #2a2a50;
+      border-radius: 8px;
+      color: #4ecdc4;
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    #addConfig:hover {
+      background: #181830;
+      border-color: #4ecdc4;
+    }
+
+    /* Helper text */
+    .help-text {
+      margin-top: 28px;
+      padding: 16px;
+      background: #0e0e1c;
+      border: 1px solid #1a1a30;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #4a4a68;
+      line-height: 1.7;
+    }
+
+    .help-text code {
+      background: #141428;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #6b6b88;
+      font-family: inherit;
+    }
+
+    .help-text strong {
+      color: #6b6b88;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #3a3a55;
+      font-size: 13px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Domain Configurations</h2>
-  <div id="domainConfigs"></div>
-  <button id="addConfig">Add New Configuration</button>
+  <div class="container">
+    <header>
+      <h1><span class="accent">&gt;</span> AEM Quicklinks</h1>
+      <p class="subtitle">Domain Configurations</p>
+    </header>
+
+    <div id="domainConfigs"></div>
+
+    <button id="addConfig">+ Add Configuration</button>
+
+    <div class="help-text">
+      <strong>Regex Pattern</strong> — Matched against the full page URL to determine which
+      environment group applies. Example: <code>author.*adobeaemcloud</code><br><br>
+      <strong>Domains</strong> — List of hostnames for this environment group.
+      Include the protocol (e.g. <code>https://author-p123.adobeaemcloud.com</code>)
+      to force it, or omit to preserve the current page's protocol.
+    </div>
+  </div>
+
   <script src="options.js"></script>
 </body>
 </html>
-
